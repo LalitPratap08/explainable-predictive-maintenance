@@ -1,229 +1,213 @@
-# Explainable Machine Learning for Predictive Maintenance
+# Predictive Maintenance Using Machine Learning
 
-> **Academic prototype** — Predictions from this system do not replace qualified engineering or maintenance decisions.
+A machine learning project that predicts potential machine failures using operational sensor data. It compares multiple classification models and provides an interactive Streamlit dashboard for exploring model performance and making predictions.
 
 ## Project Overview
 
-This project builds a software-only Machine Learning application that predicts equipment failure from historical sensor and operational data, and explains those predictions using Explainable AI (XAI) techniques.
+Unexpected machine failures can cause production delays, maintenance costs, and equipment downtime.
 
-The goal is to demonstrate how modern ML interpretability tools (SHAP) can make black-box models more trustworthy and actionable in an industrial maintenance context — without requiring physical equipment, IoT hardware, or real-time sensor streams.
+This project uses the **AI4I 2020 Predictive Maintenance Dataset** to train machine learning models that identify potential machine failures based on operating conditions.
 
----
+The project includes data preprocessing, model training, evaluation, automated testing, and an interactive dashboard.
+
+## Features
+
+- Data cleaning and preprocessing
+- Handling of imbalanced target classes
+- Stratified train-test splitting
+- Comparison of three machine learning models
+- 5-fold stratified cross-validation
+- Model evaluation using multiple classification metrics
+- Confusion matrix visualisations
+- Saved trained model for reuse
+- Interactive Streamlit prediction dashboard
+- Automated tests using Pytest
+
+## Machine Learning Models
+
+The following models are compared:
+
+1. Logistic Regression
+2. Decision Tree Classifier
+3. Random Forest Classifier
+
+Models are compared using **Precision, Recall, F1-score, ROC-AUC, and PR-AUC**.
+
+Random Forest was selected as the best model based on cross-validation PR-AUC.
 
 ## Dataset
 
 **AI4I 2020 Predictive Maintenance Dataset**
-- **Source**: UCI Machine Learning Repository — <https://archive.ics.uci.edu/dataset/601/ai4i+2020+predictive+maintenance+dataset>
-- **License**: Creative Commons Attribution 4.0 International (CC BY 4.0)
-- **Records**: 10,000 synthetic data points modelled on real industrial equipment
-- **Target column**: `Machine failure` (binary: 0 = no failure, 1 = failure)
-- **Class imbalance**: ~3.4% positive (failure) class — addressed with class-weight balancing and PR-AUC evaluation
 
-### Citation
-> Stephan Matzka. (2020). AI4I 2020 Predictive Maintenance Dataset. UCI Machine Learning Repository. https://doi.org/10.24432/C5HS5C
+Source: [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/601/ai4i+2020+predictive+maintenance+dataset)
 
-### How to obtain the dataset
-The dataset must be placed manually if automatic download fails:
+- 10,000 observations
+- 14 original columns
+- Target variable: `Machine failure`
+- Failure cases represent approximately 3.4% of the dataset.
 
-1. Visit <https://archive.ics.uci.edu/dataset/601/ai4i+2020+predictive+maintenance+dataset>
-2. Download `ai4i2020.csv`
-3. Place it at `data/raw/ai4i2020.csv`
+The raw dataset is not included in this repository. Download it from UCI and place `ai4i2020.csv` inside:
 
----
+`data/raw/ai4i2020.csv`
 
-## Technology Stack
+## Model Performance
 
-| Tool | Version | Purpose |
-|------|---------|---------|
-| Python | 3.10+ | Core language |
-| Pandas | ≥2.0 | Data manipulation |
-| NumPy | ≥1.24 | Numerical operations |
-| Scikit-learn | ≥1.3 | ML pipeline, models, evaluation |
-| SHAP | ≥0.44 | Explainable AI |
-| Matplotlib / Seaborn | ≥3.7 / ≥0.12 | Static visualisations |
-| Plotly | ≥5.18 | Interactive charts in dashboard |
-| Streamlit | ≥1.32 | Web dashboard |
-| Joblib | ≥1.3 | Model persistence |
-| Pytest | ≥7.4 | Automated testing |
-| Jupyter | ≥1.0 | Experimental notebooks |
+### Cross-validation results
 
----
+| Model | Mean PR-AUC | Standard Deviation |
+|---|---:|---:|
+| Logistic Regression | 0.4409 | 0.0299 |
+| Decision Tree | 0.5282 | 0.0484 |
+| Random Forest | **0.7388** | 0.0367 |
+
+### Test set results
+
+| Model | Accuracy | Precision | Recall | F1-score | ROC-AUC | PR-AUC |
+|---|---:|---:|---:|---:|---:|---:|
+| Logistic Regression | 0.8245 | 0.1418 | 0.8235 | 0.2419 | 0.9070 | 0.3818 |
+| Decision Tree | 0.9585 | 0.4324 | 0.7059 | 0.5363 | 0.8454 | 0.5746 |
+| Random Forest | **0.9795** | **0.7213** | 0.6471 | **0.6822** | **0.9612** | **0.7551** |
+
+Random Forest achieved the highest test PR-AUC and was selected as the best overall model.
+
+Because the dataset is imbalanced, accuracy alone is not sufficient to evaluate failure prediction performance.
 
 ## Project Structure
 
-```
+```text
 explainable-predictive-maintenance/
+│
+├── dashboard/
+│   └── app.py
+│
 ├── data/
-│   ├── raw/            ← Place ai4i2020.csv here
-│   └── processed/      ← Generated after preprocessing
+│   ├── raw/
+│   └── processed/
+│
+├── models/
+│   ├── best_pipeline.joblib
+│   └── model_metadata.json
+│
 ├── notebooks/
-│   ├── 01_data_exploration.ipynb
-│   ├── 02_preprocessing.ipynb
-│   ├── 03_model_training.ipynb
-│   └── 04_model_explainability.ipynb
+│
+├── results/
+│   ├── confusion_matrix_decision_tree.png
+│   ├── confusion_matrix_logistic_regression.png
+│   ├── confusion_matrix_random_forest.png
+│   ├── model_comparison_cv.csv
+│   └── test_metrics.json
+│
 ├── src/
 │   ├── __init__.py
-│   ├── preprocessing.py   ← Data loading, validation, feature engineering
-│   ├── train.py           ← Model training and comparison
-│   ├── predict.py         ← Inference on new readings
-│   └── explain.py         ← SHAP global and local explanations
-├── dashboard/
-│   └── app.py             ← Streamlit dashboard
-├── models/                ← Saved pipeline artifacts (.joblib)
-├── results/               ← Plots, metrics, experiment outputs
-├── tests/                 ← Pytest test suite
+│   ├── preprocessing.py
+│   └── train.py
+│
+├── tests/
+│   ├── __init__.py
+│   ├── test_preprocessing.py
+│   └── test_train.py
+│
 ├── requirements.txt
-├── .gitignore
-├── README.md
-└── LICENSE
+└── README.md
 ```
 
----
-
-## Setup Instructions
+## Installation and Setup
 
 ### 1. Clone the repository
+
 ```bash
-git clone https://github.com/Maaz4484/Zero-Deps.git
+git clone https://github.com/LalitPratap08/explainable-predictive-maintenance.git
 cd explainable-predictive-maintenance
 ```
 
-### 2. Create and activate a virtual environment
-```bash
-# Windows
-python -m venv .venv
-.venv\Scripts\activate
+### 2. Create a virtual environment
 
-# macOS / Linux
+```bash
 python -m venv .venv
-source .venv/bin/activate
+```
+
+Activate it on Windows:
+
+```powershell
+.venv\Scripts\activate
 ```
 
 ### 3. Install dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Place the dataset
-Download `ai4i2020.csv` from UCI (link above) and copy it to:
-```
+### 4. Download the dataset
+
+Download the AI4I 2020 dataset from the UCI Machine Learning Repository and place the CSV file at:
+
+```text
 data/raw/ai4i2020.csv
 ```
 
----
+## Running the Project
 
-## ML Pipeline
-
-The pipeline is implemented in stages to prevent data leakage:
-
-1. **Load & Validate** — schema checks, duplicate removal, type validation
-2. **Exploratory Data Analysis** — class distribution, correlations, feature histograms
-3. **Preprocessing** — StandardScaler for numerics, OneHotEncoder for categoricals; fitted on training split only
-4. **Train / Test Split** — stratified 80/20 split, `random_state=42`
-5. **Model Training & Comparison**:
-   - Logistic Regression (baseline)
-   - Decision Tree
-   - Random Forest *(primary candidate)*
-6. **Evaluation** — F1, Recall, Precision, ROC-AUC, PR-AUC, Confusion Matrix
-7. **Model Selection** — based on validation PR-AUC (not test-set performance)
-8. **SHAP Explainability** — global feature importance + local per-prediction explanations
-9. **Artifact Saving** — full sklearn Pipeline saved via Joblib
-
----
-
-## Evaluation Strategy
-
-Given the severe class imbalance (~3.4% positives), evaluation focuses on:
-
-- **PR-AUC** — primary selection metric (robust to imbalance)
-- **Recall** — priority metric (missed failures are costly)
-- **F1-score** — balanced view of precision and recall
-- **ROC-AUC** — secondary metric
-- **Confusion matrix** — to inspect false positive / false negative trade-off
-
-> Accuracy alone is **not** used for model selection.
-
----
-
-## Explainability
-
-SHAP (SHapley Additive exPlanations) is used to explain model predictions:
-
-- **Global**: Feature importance bar plot, SHAP summary plot
-- **Local**: Waterfall plot for individual predictions showing feature contributions
-
-**Important note**: Feature contribution values indicate statistical associations learned from the training data. They do not establish causal relationships between features and equipment failures.
-
----
-
-## Running the Dashboard
+### Train the models
 
 ```bash
-streamlit run dashboard/app.py
-```
-
-The dashboard requires trained model artifacts in `models/`. Run the training pipeline first.
-
----
-
-## Running Tests
-
-```bash
-pytest tests/ -v
-```
-
----
-
-## Reproducing Experiments
-
-```bash
-# Step 1 — Preprocess data
-python -m src.preprocessing
-
-# Step 2 — Train and compare models
 python -m src.train
-
-# Step 3 — Generate SHAP explanations
-python -m src.explain
-
-# Step 4 — Launch dashboard
-streamlit run dashboard/app.py
 ```
 
+This runs preprocessing, model training, cross-validation, evaluation, and model saving.
+
+### Launch the Streamlit dashboard
+
+```bash
+python -m streamlit run dashboard/app.py
+```
+
+Open the local URL displayed in your terminal, usually:
+
+`http://localhost:8501`
+
+### Run automated tests
+
+```bash
+python -m pytest tests/ -v
+```
+
+**Current test status:** 67 tests passed.
+
+## Dashboard
+
+The Streamlit dashboard provides:
+
+- Model performance overview
+- Cross-validation comparison
+- Confusion matrices
+- Interactive machine failure prediction
+
+## Limitations
+
+- The project uses the AI4I 2020 dataset, which is synthetic.
+- Failure events are significantly less frequent than normal operating conditions.
+- Model performance on this dataset does not guarantee equivalent performance on real industrial equipment.
+- Predictions are intended for academic demonstration and should not be used as the sole basis for real maintenance decisions.
+
+## Technologies Used
+
+- Python
+- NumPy
+- Pandas
+- Scikit-learn
+- Matplotlib
+- Seaborn
+- Streamlit
+- Joblib
+- Pytest
+
+## Author
+
+**Lalit Pratap**
+
+GitHub: [@LalitPratap08](https://github.com/LalitPratap08)
+
 ---
 
-## Implementation Status
-
-| Stage | Description | Status |
-|-------|-------------|--------|
-| 1 | Repository inspection and planning | ✅ Complete |
-| 2 | Project structure, requirements, .gitignore | ✅ Complete |
-| 3 | Dataset loading, EDA, preprocessing | 🔄 In Progress — `src/preprocessing.py` complete, tests written |
-| 4 | Model training, evaluation, artifact saving | 🔄 In Progress — `src/train.py` complete, tests written |
-| 5 | SHAP explainability and experiment outputs | 🔲 Pending |
-| 6 | Streamlit dashboard | 🔲 Pending |
-| 7 | Tests, validation, final documentation | 🔲 Pending |
-
----
-
-## Known Limitations
-
-- The AI4I 2020 dataset is **synthetically generated** and may not reflect all real-world failure patterns.
-- With only ~340 positive samples, model generalisation is limited.
-- SHAP explanations for tree ensembles are exact; for linear models they are approximate.
-- No real-time sensor integration — this is a batch-prediction prototype.
-- Early-warning prediction (time-to-failure) is not implemented; only binary failure classification.
-- Results should be interpreted in the context of the training distribution only.
-
----
-
-## License
-
-This project is released under the MIT License. See [LICENSE](LICENSE) for details.
-
-The AI4I 2020 dataset is licensed under CC BY 4.0 — attribution required.
-
----
-
-
-
+*Developed as an individual academic machine learning project.*
