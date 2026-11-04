@@ -1,0 +1,48 @@
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment variables and secrets
+.env
+*.key
+*.pem
+secrets.json
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Dataset
+# Keep the dataset out of Git; document its download source in README
+data/raw/*.csv
+data/raw/*.xlsx
+data/raw/*.zip
+
+# Processed data
+data/processed/
+
+# Streamlit
+.streamlit/
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Testing and coverage
+.pytest_cache/
+htmlcov/
+.coverage
+coverage.xml
+.mypy_cache/

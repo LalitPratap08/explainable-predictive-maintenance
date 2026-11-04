@@ -1,0 +1,38 @@
+# ============================================================
+# Explainable ML for Predictive Maintenance — Dependencies
+# Python 3.10+ required
+# Install with: pip install -r requirements.txt
+# ============================================================
+
+# --- Core data science ---
+numpy>=1.24,<2.0
+pandas>=2.0,<3.0
+scipy>=1.10,<2.0
+
+# --- Machine learning ---
+scikit-learn>=1.3,<2.0
+
+# --- Explainability ---
+shap>=0.44,<1.0
+
+# --- Visualisation ---
+matplotlib>=3.7,<4.0
+seaborn>=0.12,<1.0
+plotly>=5.18,<6.0
+
+# --- Dashboard ---
+streamlit>=1.32,<2.0
+
+# --- Model persistence ---
+joblib>=1.3,<2.0
+
+# --- Notebook support ---
+jupyter>=1.0,<2.0
+ipykernel>=6.25,<7.0
+
+# --- Testing ---
+pytest>=7.4,<9.0
+pytest-cov>=4.1,<6.0
+
+# --- Utilities ---
+tqdm>=4.65,<5.0
